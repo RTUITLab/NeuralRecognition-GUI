@@ -5,12 +5,15 @@ import React, { CSSProperties } from "react";
     private startPosition: Coordinate;
     private fieldSize: Coordinate;
     private size: number;
+    public timeout: NodeJS.Timeout | undefined;
+    public interval: NodeJS.Timeout | undefined;
 
     constructor(startPosition: Coordinate, fieldSize: Coordinate, size: number, private color: string) {
         this.position = startPosition;
         this.startPosition = startPosition;
         this.fieldSize = fieldSize;
         this.size = size;
+        this.timeout = undefined;
     }
 
     public getStyle(origin: Coordinate): CSSProperties {        
@@ -50,6 +53,49 @@ import React, { CSSProperties } from "react";
 
         if (this.position.y < 0) {
             this.position.y = 0;
+        }
+    }
+
+    public clearTimers(): void {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = undefined;
+        }
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = undefined;
+        }
+    }
+
+    public returnBlock(velocity: Coordinate) {
+        if (this.startPosition.x !== this.position.x || this.startPosition.y !== this.position.y) {
+            if (velocity.x > 0) {
+                this.position.x = this.position.x + velocity.x;
+                if (this.position.x > this.startPosition.x) {
+                    this.position.x = this.startPosition.x;
+                }
+            }
+            if (velocity.x < 0) {
+                this.position.x = this.position.x + velocity.x;
+                if (this.position.x < this.startPosition.x) {
+                    this.position.x = this.startPosition.x;
+                }
+            }
+            if (velocity.y > 0) {
+                this.position.y = this.position.y + velocity.y;
+                if (this.position.y > this.startPosition.y) {
+                    this.position.y = this.startPosition.y;
+                }
+            }
+            if (velocity.y < 0) {
+                this.position.y = this.position.y + velocity.y;
+                if (this.position.y < this.startPosition.y) {
+                    this.position.y = this.startPosition.y;
+                }
+            }
+        }
+        else {
+            this.clearTimers();
         }
     }
 }
@@ -125,6 +171,13 @@ export class VisualBlock extends React.Component<BlockProps, {}> {
 export type Coordinate = {
     x: number,
     y: number
+}
+
+export enum Blocks {
+    Yellow = 0,
+    Red = 1,
+    Green = 2,
+    Blue = 3
 }
 
 type BlockProps = {

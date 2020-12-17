@@ -1,10 +1,31 @@
 import React from 'react';
 import IController from '../../controllers/IController';
 import KeyboardController from '../../controllers/KeyboardController';
-import { Block, LargeBlock, SmallBlock, Coordinate, VisualBlock } from '../Block/block';
+import { Block, LargeBlock, SmallBlock, Coordinate, VisualBlock, Blocks } from '../Block/block';
 import './field.css';
 
-class Field extends React.Component<{}, FieldState> {
+let velocities = (moveV: number, returnV: number): Velocities => {
+    return({
+        move: [
+            { x: -moveV, y: 0 },
+            { x: 0, y: -moveV },
+            { x: moveV, y: 0 },
+            { x: 0, y: moveV }
+        ],
+        return: [
+            { x: returnV, y: 0},
+            { x: 0, y: returnV},
+            { x: -returnV, y: 0},
+            { x: 0, y: -returnV}
+        ]
+    });
+}
+
+class Field extends React.Component<FieldProps, FieldState> {
+    static defaultProps = {
+        moveVelocity: 1,
+        returnVelocity: 5
+    }
 
     componentWillMount() {
         if (!this.state) {
@@ -29,9 +50,9 @@ class Field extends React.Component<{}, FieldState> {
 
         let blocks: Array<Block> = [
             new LargeBlock(fieldSize),
-            new SmallBlock(fieldSize, 1),
-            new SmallBlock(fieldSize, 2),
-            new SmallBlock(fieldSize, 3),
+            new SmallBlock(fieldSize, Blocks.Red),
+            new SmallBlock(fieldSize, Blocks.Green),
+            new SmallBlock(fieldSize, Blocks.Blue),
         ]
         this.setState({
             blocks: blocks,
@@ -46,26 +67,17 @@ class Field extends React.Component<{}, FieldState> {
         controller.enable();
 
         /*setInterval(() => {
-            //console.log("bzzzz");
             let blocks = this.state.blocks;
-            blocks[0].getPosition() = { x: blocks[0].getPosition().x - 1, y: 0};
+            blocks[0].returnBlock({ x: 5, y: 0 });
             this.setState({blocks: blocks});
-        }, 1);*/
-    }
-
-    componentDidUpdate() {
-        const blocks = this.state.blocks;
-
-        blocks.forEach((block, i) => {
-            
-        })
+        }, 5);*/
     }
 
     render() {
         return (
             <div id="Field" className="Field">
                 {this.state.blocks.map((block, index) => (
-                    <VisualBlock key={index} Style={block.getStyle(this.state.origin)}>123</VisualBlock>
+                    <VisualBlock key={index} Style={block.getStyle(this.state.origin)}></VisualBlock>
                 ))}
             </div>
         )
@@ -73,38 +85,55 @@ class Field extends React.Component<{}, FieldState> {
 
     setupListeners = () => {
         document.addEventListener('redUp', (e) => {
-            let blocks = this.state.blocks;
-
-            blocks[1].move({ x: 0, y: -1 });
-            this.setState({blocks: blocks});
+            this.handleEvent(Blocks.Red);
         })
 
         document.addEventListener('greenRight', (e) => {
-            let blocks = this.state.blocks;
-
-            blocks[2].move({ x: 1, y: 0 });
-            this.setState({blocks: blocks});
+            this.handleEvent(Blocks.Green);
         })
 
         document.addEventListener('yellowLeft', (e) => {
-            let blocks = this.state.blocks;
-
-            blocks[0].move({ x: -1, y: 0 });
-            this.setState({blocks: blocks});
+            this.handleEvent(Blocks.Yellow);
         })
 
         document.addEventListener('blueDown', (e) => {
-            let blocks = this.state.blocks;
-
-            blocks[3].move({ x: 0, y: 1 });
-            this.setState({blocks: blocks});
+            this.handleEvent(Blocks.Blue);
         })
+    }
+
+    handleEvent(block: Blocks) {
+        let blocks = this.state.blocks;
+
+        blocks[block].clearTimers();
+
+        blocks[block].move(velocities(this.props.moveVelocity, this.props.returnVelocity).move[block]);
+
+        blocks[block].timeout = setTimeout(() => {
+            blocks[block].interval = setInterval(() => {
+                let blocks = this.state.blocks;
+                blocks[block].returnBlock(velocities(this.props.moveVelocity, this.props.returnVelocity).return[block]);
+                this.setState({blocks: blocks});
+                console.log("bzzzz");
+            }, 5);
+        }, 500);
+        
+        this.setState({blocks: blocks});
     }
 }
 
 type FieldState = {
     blocks: Array<Block>,
     origin: Coordinate
+}
+
+type FieldProps = {
+    moveVelocity: number,
+    returnVelocity: number
+}
+
+type Velocities = {
+    move: Array<Coordinate>,
+    return: Array<Coordinate>
 }
 
 export default Field;
