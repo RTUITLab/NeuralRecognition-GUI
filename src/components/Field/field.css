@@ -1,0 +1,8 @@
+.Field {
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    grid-column: 2;
+    margin-left: 20px;
+    background-color:  #F5F5F5;
+    box-shadow: 1px 3px 7px 0px rgba(231, 231, 231, 1) inset;
+}
