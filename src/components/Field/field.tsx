@@ -1,4 +1,6 @@
 import React from 'react';
+import IController from '../../controllers/IController';
+import KeyboardController from '../../controllers/KeyboardController';
 import { Block, LargeBlock, SmallBlock, Coordinate, VisualBlock } from '../Block/block';
 import './field.css';
 
@@ -36,12 +38,27 @@ class Field extends React.Component<{}, FieldState> {
             origin: origin
         });
 
+        // Adding custom event listeners
+        this.setupListeners();
+
+        // Controller connection
+        const controller: IController = KeyboardController;
+        controller.enable();
+
         /*setInterval(() => {
             //console.log("bzzzz");
-            let a = this.state.blocks;
-            a[0].position = { x: a[0].position.x - 1, y: 0};
+            let blocks = this.state.blocks;
+            blocks[0].getPosition() = { x: blocks[0].getPosition().x - 1, y: 0};
             this.setState({blocks: blocks});
         }, 1);*/
+    }
+
+    componentDidUpdate() {
+        const blocks = this.state.blocks;
+
+        blocks.forEach((block, i) => {
+            
+        })
     }
 
     render() {
@@ -52,6 +69,36 @@ class Field extends React.Component<{}, FieldState> {
                 ))}
             </div>
         )
+    }
+
+    setupListeners = () => {
+        document.addEventListener('redUp', (e) => {
+            let blocks = this.state.blocks;
+
+            blocks[1].move({ x: 0, y: -1 });
+            this.setState({blocks: blocks});
+        })
+
+        document.addEventListener('greenRight', (e) => {
+            let blocks = this.state.blocks;
+
+            blocks[2].move({ x: 1, y: 0 });
+            this.setState({blocks: blocks});
+        })
+
+        document.addEventListener('yellowLeft', (e) => {
+            let blocks = this.state.blocks;
+
+            blocks[0].move({ x: -1, y: 0 });
+            this.setState({blocks: blocks});
+        })
+
+        document.addEventListener('blueDown', (e) => {
+            let blocks = this.state.blocks;
+
+            blocks[3].move({ x: 0, y: 1 });
+            this.setState({blocks: blocks});
+        })
     }
 }
 

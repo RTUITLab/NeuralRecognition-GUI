@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
 
  export class Block {
-    public position: Coordinate;
+    private position: Coordinate;
     private startPosition: Coordinate;
     private fieldSize: Coordinate;
     private size: number;
@@ -23,6 +23,34 @@ import React, { CSSProperties } from "react";
             background: this.color,
             borderRadius: 10
         })
+    }
+
+    public getPosition() {
+        return this.position;
+    }
+    
+
+    public move(velocity: Coordinate) {
+        this.position = {
+            x: this.position.x + velocity.x,
+            y: this.position.y + velocity.y
+        }
+
+        if (this.position.x > this.fieldSize.x) {
+            this.position.x = this.fieldSize.x;
+        }
+
+        if (this.position.x < 0) {
+            this.position.x = 0;
+        }
+
+        if (this.position.y > this.fieldSize.y) {
+            this.position.y = this.fieldSize.y;
+        }
+
+        if (this.position.y < 0) {
+            this.position.y = 0;
+        }
     }
 }
 
