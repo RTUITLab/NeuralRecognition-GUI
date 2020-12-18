@@ -2,3 +2,26 @@
     display: grid;
     grid-template-columns: 25%;
 }
+
+.Settings {
+    display: flex;
+    min-width: 480px;
+    width: 50%;
+    height: 70px;
+    grid-column: 2;
+    margin-top: -90px;
+    margin-left: auto;
+    border-radius: 13px;
+    box-shadow: 1px 4px 4px 0px rgba(160, 160, 160, 0.33);
+    background-color: #F0F0F0;
+    opacity: 0.2;
+    transition: 0.3s ease;
+}
+
+.Settings:hover {
+    opacity: 1;
+}
+
+.Settings > * {
+    margin: auto 5px;
+}
