@@ -5,11 +5,13 @@ import Header from './components/Header/header';
 import Menu from './components/Menu/menu';
 
 class App extends React.Component<{}, AppState> {
-  componentWillMount() {
-    this.setState({
+  constructor(props: any) {
+    super(props);
+    
+    this.state = {
       moveVel: 1,
       returnVel: 5
-    });
+    };
 
     window.onresize = () => {
       window.location.reload();

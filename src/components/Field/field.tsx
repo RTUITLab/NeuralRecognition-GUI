@@ -27,12 +27,13 @@ class Field extends React.Component<FieldProps, FieldState> {
         returnVelocity: 5
     }
 
-    componentWillMount() {
-        if (!this.state) {
-            this.setState({
-                blocks: []
-            });
-        }
+    constructor(props: any) {
+        super(props);
+
+        this.state = {
+            blocks: [],
+            origin: { x: 0, y: 0 }
+        };
     }
 
     componentDidMount() {
