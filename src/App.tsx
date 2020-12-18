@@ -9,7 +9,11 @@ class App extends React.Component<{}, AppState> {
     this.setState({
       moveVel: 1,
       returnVel: 5
-    })
+    });
+
+    window.onresize = () => {
+      window.location.reload();
+    }
   }
 
   checkKey(e: React.KeyboardEvent) {
@@ -19,7 +23,6 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-
     return (
       <div className="App">
         <Header></Header>

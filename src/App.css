@@ -25,3 +25,14 @@
 .Settings > * {
     margin: auto 5px;
 }
+
+@media screen and (max-width: 750px) {
+    .Settings {
+        flex-direction: column;
+        min-width: 200px;
+        width: 200px;
+        height: 90px;
+        padding: 10px;
+        margin-top: -130px;
+    }
+}
