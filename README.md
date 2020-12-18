@@ -1,12 +1,14 @@
 # NeuralRecognition GUI
 
+Run `npm i` to install required dependencies after cloning.
+
 ### Development mode
 
 Run `npm start` in the project directory to run the app in development mode.
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
+The page will reload if you make edits.
 
 ### Producion mode
 
