@@ -275,7 +275,7 @@ export class SmallBlock extends Block {
 export class VisualBlock extends React.Component<BlockProps, {}> {
     render() {
         return (
-            <div style={this.props.Style}><span contentEditable style={{display: 'table-cell', width: '100%', verticalAlign: 'middle', color: 'white' }}></span></div>
+            <div style={this.props.Style}><span contentEditable style={{display: 'table-cell', width: '100%', verticalAlign: 'middle', color: 'black', fontSize: '2em' }}></span></div>
         )
     }
 }
