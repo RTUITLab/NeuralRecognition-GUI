@@ -23,11 +23,17 @@ import React, { CSSProperties } from "react";
             if (this.barrier.left - change < 0) {
                 this.barrier.left = 0;
                 return false
+            } else if (this.barrier.left - change > this.startPosition.x) {
+                this.barrier.left = this.startPosition.x;
+                return false
             }
             else this.barrier.left = this.barrier.left - change;
         } else if (dir.y === -1) {
             if (this.barrier.top - change < 0) {
                 this.barrier.top = 0;
+                return false
+            } else if (this.barrier.top - change > this.startPosition.y) {
+                this.barrier.top = this.startPosition.y;
                 return false
             }
             else this.barrier.top = this.barrier.top - change;
@@ -35,12 +41,18 @@ import React, { CSSProperties } from "react";
             if (this.barrier.right - change > this.fieldSize.x) {
                 this.barrier.right = this.fieldSize.x;
                 return false;
+            } else if (this.barrier.right - change < this.startPosition.x) {
+                this.barrier.right = this.startPosition.x;
+                return false
             }
             else this.barrier.right = this.barrier.right - change;
         } else if (dir.y === 1) {
             if (this.barrier.bottom - change > this.fieldSize.y) {
                 this.barrier.bottom = this.fieldSize.y;
                 return false;
+            } else if (this.barrier.bottom - change < this.startPosition.y) {
+                this.barrier.bottom = this.startPosition.y;
+                return false
             }
             else this.barrier.bottom = this.barrier.bottom - change;
         }
