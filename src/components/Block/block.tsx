@@ -4,12 +4,12 @@ import React, { CSSProperties } from "react";
     private position: Coordinate;
     private startPosition: Coordinate;
     private fieldSize: Coordinate;
-    private size: number;
+    private size: Coordinate;
     public barrier: Barrier;
     public timeout: NodeJS.Timeout | undefined;
     public interval: NodeJS.Timeout | undefined;
 
-    constructor(startPosition: Coordinate, fieldSize: Coordinate, barrier: Barrier, size: number, private color: string) {
+    constructor(startPosition: Coordinate, fieldSize: Coordinate, barrier: Barrier, size: Coordinate, private color: string) {
         this.position = startPosition;
         this.startPosition = startPosition;
         this.fieldSize = fieldSize;
@@ -54,8 +54,8 @@ import React, { CSSProperties } from "react";
             display: 'table',
             top: this.position.y + origin.y,
             left: this.position.x + origin.x,
-            width: this.size,
-            height: this.size,
+            width: this.size.x,
+            height: this.size.y,
             background: this.color,
             borderRadius: 10,
             textAlign: 'center'
@@ -70,21 +70,21 @@ import React, { CSSProperties } from "react";
         if (this.barrier.top > -1) {
             pos.x = this.position.x + origin.x;
             pos.y = this.barrier.top + origin.y - baseSize / 2;
-            size.x = this.size;
+            size.x = this.size.x;
             size.y = baseSize;
         }
         
         if (this.barrier.right > -1) {
-            pos.x = this.barrier.right + origin.x + this.size - baseSize / 2;
+            pos.x = this.barrier.right + origin.x + this.size.x - baseSize / 2;
             pos.y = this.position.y + origin.y;
             size.x = baseSize;
-            size.y = this.size;
+            size.y = this.size.y;
         }
         
         if (this.barrier.bottom > -1) {
             pos.x = this.position.x + origin.x;
-            pos.y = this.barrier.bottom + origin.y + this.size - baseSize / 2;
-            size.x = this.size;
+            pos.y = this.barrier.bottom + origin.y + this.size.y - baseSize / 2;
+            size.x = this.size.x;
             size.y = baseSize;
         }
         
@@ -92,7 +92,7 @@ import React, { CSSProperties } from "react";
             pos.x = this.barrier.left + origin.x - baseSize / 2;
             pos.y = this.position.y + origin.y;
             size.x = baseSize;
-            size.y = this.size;
+            size.y = this.size.y;
         }
 
         return ({
@@ -103,7 +103,8 @@ import React, { CSSProperties } from "react";
             height: size.y,
             background: this.color,
             borderRadius: 10,
-            cursor: 'pointer'
+            cursor: 'pointer',
+            zIndex: 2
         })
     }
 
@@ -191,7 +192,7 @@ export class LargeBlock extends Block {
     constructor(fieldSize: Coordinate) {
         let blockSize = fieldSize.x / 6 > fieldSize.y / 7 ? fieldSize.y * 3 / 7 : fieldSize.x / 2;
         const startPosition: Coordinate = {
-            x: fieldSize.x / 2 - 2 * blockSize / 3 + 5,
+            x: fieldSize.x / 2 - blockSize + 5,
             y: fieldSize.y / 2 - blockSize / 2 + 5
         };
         blockSize = blockSize - 10;
@@ -203,13 +204,16 @@ export class LargeBlock extends Block {
         const barrier: Barrier = new Barrier();
         barrier.left = 0;
 
-        super(startPosition, blockField, barrier, blockSize, '#ffcc3c');
+        super(startPosition, blockField, barrier, { x: blockSize, y: blockSize}, '#ffcc3c');
     }
 }
 
 export class SmallBlock extends Block {
     constructor(fieldSize: Coordinate, position: number) {
-        let blockSize = fieldSize.x / 6 > fieldSize.y / 7 ? fieldSize.y / 7 : fieldSize.x / 6;
+        let blockSize: Coordinate = {
+            x: fieldSize.x / 6 > fieldSize.y / 7 ? fieldSize.y * 3 / 7 : fieldSize.x / 2,
+            y: fieldSize.x / 6 > fieldSize.y / 7 ? fieldSize.y / 7 : fieldSize.x / 6
+        } // = fieldSize.x / 6 > fieldSize.y / 7 ? fieldSize.y / 7 : fieldSize.x / 6;
         
         let startPosition: Coordinate = { x: 0, y: 0};
         let color = '';
@@ -219,8 +223,8 @@ export class SmallBlock extends Block {
         switch(position) {
             case (1): {
                 startPosition = {
-                    x: fieldSize.x / 2 + blockSize + 5,
-                    y: fieldSize.y / 2 - 3 * blockSize / 2 + 5
+                    x: fieldSize.x / 2 + 5,
+                    y: fieldSize.y / 2 - 3 * blockSize.y / 2 + 5
                 };
                 color = '#ff2c22';
                 barrier.top = 0;
@@ -228,28 +232,28 @@ export class SmallBlock extends Block {
             }
             case (2): {
                 startPosition = {
-                    x: fieldSize.x / 2 + blockSize + 5,
-                    y: fieldSize.y / 2 - blockSize / 2 + 5
+                    x: fieldSize.x / 2 + 5,
+                    y: fieldSize.y / 2 - blockSize.y / 2 + 5
                 };
                 color = '#00dc00';
-                barrier.right = fieldSize.x - blockSize + 10;
+                barrier.right = fieldSize.x - blockSize.x + 10;
                 break;
             }
             case (3): {
                 startPosition = {
-                    x: fieldSize.x / 2 + blockSize + 5,
-                    y: fieldSize.y / 2 + blockSize / 2 + 5
+                    x: fieldSize.x / 2 + 5,
+                    y: fieldSize.y / 2 + blockSize.y / 2 + 5
                 };
                 color = '#445bff';
-                barrier.bottom = fieldSize.y - blockSize + 10;
+                barrier.bottom = fieldSize.y - blockSize.y + 10;
                 break;
             }
         }
-        blockSize = blockSize - 10;
+        blockSize = { x: blockSize.x - 10, y: blockSize.y - 10 };
 
         const blockField: Coordinate = {
-            x: fieldSize.x - blockSize,
-            y: fieldSize.y - blockSize
+            x: fieldSize.x - blockSize.x,
+            y: fieldSize.y - blockSize.y
         }
 
         super(startPosition, blockField, barrier, blockSize, color);
