@@ -12,6 +12,5 @@ stages:
   jobs:
   - job: BuildApp
     steps:
-    - script: npm i -g yarn
     - script: yarn install
     - script: yarn run build
