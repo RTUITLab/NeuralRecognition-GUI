@@ -1,9 +1,3 @@
-trigger:
-  - master
-  - develop
-
-name: $(BuildID)-$(Build.SourceBranchName)
-
 pool:
   vmImage: "ubuntu-latest"
 
