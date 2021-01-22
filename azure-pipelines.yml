@@ -26,5 +26,5 @@ stages:
         Dockerfile: 'Dockerfile'
         tags: |
           $(Build.BuildId)
-          latest-build
+          latest
 
