@@ -51,12 +51,14 @@ import React, { CSSProperties } from "react";
     public getStyle(origin: Coordinate): CSSProperties {        
         return ({
             position: 'absolute',
+            display: 'table',
             top: this.position.y + origin.y,
             left: this.position.x + origin.x,
             width: this.size,
             height: this.size,
             background: this.color,
-            borderRadius: 10
+            borderRadius: 10,
+            textAlign: 'center'
         })
     }
 
@@ -257,7 +259,7 @@ export class SmallBlock extends Block {
 export class VisualBlock extends React.Component<BlockProps, {}> {
     render() {
         return (
-            <div style={this.props.Style}></div>
+            <div style={this.props.Style}><span contentEditable style={{display: 'table-cell', width: '100%', verticalAlign: 'middle', color: 'white' }}></span></div>
         )
     }
 }
