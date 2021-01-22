@@ -1,7 +1,7 @@
 import React from 'react';
 import IController from '../../controllers/IController';
 import KeyboardController from '../../controllers/KeyboardController';
-import { Block, LargeBlock, SmallBlock, Coordinate, VisualBlock, Blocks } from '../Block/block';
+import { Block, LargeBlock, SmallBlock, Coordinate, VisualBlock, Blocks, VisualBarrier } from '../Block/block';
 import './field.css';
 
 let velocities = (moveV: number, returnV: number): Velocities => {
@@ -72,6 +72,22 @@ class Field extends React.Component<FieldProps, FieldState> {
             blocks[0].returnBlock({ x: 5, y: 0 });
             this.setState({blocks: blocks});
         }, 5);*/
+
+        // Barrier drag
+        setTimeout(() => {
+            let elem = document.getElementById('barr0')!;
+            elem.onmousedown = (e) => this.dragBarr(e, 0);
+
+            elem = document.getElementById('barr1')!;
+            elem.onmousedown = (e) => this.dragBarr(e, 1);
+
+            elem = document.getElementById('barr2')!;
+            elem.onmousedown = (e) => this.dragBarr(e, 2);
+
+            elem = document.getElementById('barr3')!;
+            elem.onmousedown = (e) => this.dragBarr(e, 3);
+        }, 100);
+        
     }
 
     render() {
@@ -79,6 +95,9 @@ class Field extends React.Component<FieldProps, FieldState> {
             <div id="Field" className="Field">
                 {this.state.blocks.map((block, index) => (
                     <VisualBlock key={index} Style={block.getStyle(this.state.origin)}></VisualBlock>
+                ))}
+                {this.state.blocks.map((block, index) => (
+                    <VisualBarrier Id={`barr${index}`} key={index} Style={block.getBarrierStyle(this.state.origin)}></VisualBarrier>
                 ))}
             </div>
         )
@@ -119,6 +138,43 @@ class Field extends React.Component<FieldProps, FieldState> {
         }, 500);
         
         this.setState({blocks: blocks});
+    }
+
+    public dragBarr(e: Event, id: number) {
+        // @ts-ignore
+        let currPos: Coordinate = { x: e.clientX, y: e.clientY};
+        console.log(currPos);
+
+        document.onmouseup = this.finishDrag;
+
+        document.onmousemove = (e) => {
+            let blocks = this.state.blocks;
+            // @ts-ignore
+            const change: Coordinate = { x: currPos.x - e.clientX, y: currPos.y - e.clientY };
+            currPos = { x: e.clientX, y: e.clientY};
+
+            if (id === 0) {
+                if (!blocks[0].setBarrier(change.x, { x: -1, y: 0 })) this.finishDrag();
+                this.setState({blocks: blocks});
+            }
+            if (id === 1) {
+                if (!blocks[1].setBarrier(change.y, { x: 0, y: -1 })) this.finishDrag();
+                this.setState({blocks: blocks});
+            }
+            if (id === 2) {
+                if (!blocks[2].setBarrier(change.x, { x: 1, y: 0 })) this.finishDrag();
+                this.setState({blocks: blocks});
+            }
+            if (id === 3) {
+                if (!blocks[3].setBarrier(change.y, { x: 0, y: 1 })) this.finishDrag();
+                this.setState({blocks: blocks});
+            }
+        }
+    }
+
+    private finishDrag() {
+        document.onmouseup = null;
+        document.onmousemove = null;
     }
 }
 
