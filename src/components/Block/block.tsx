@@ -5,15 +5,47 @@ import React, { CSSProperties } from "react";
     private startPosition: Coordinate;
     private fieldSize: Coordinate;
     private size: number;
+    public barrier: Barrier;
     public timeout: NodeJS.Timeout | undefined;
     public interval: NodeJS.Timeout | undefined;
 
-    constructor(startPosition: Coordinate, fieldSize: Coordinate, size: number, private color: string) {
+    constructor(startPosition: Coordinate, fieldSize: Coordinate, barrier: Barrier, size: number, private color: string) {
         this.position = startPosition;
         this.startPosition = startPosition;
         this.fieldSize = fieldSize;
         this.size = size;
+        this.barrier = barrier;
         this.timeout = undefined;
+    }
+
+    public setBarrier(change: number, dir: Coordinate): boolean {
+        if (dir.x === -1) {
+            if (this.barrier.left - change < 0) {
+                this.barrier.left = 0;
+                return false
+            }
+            else this.barrier.left = this.barrier.left - change;
+        } else if (dir.y === -1) {
+            if (this.barrier.top - change < 0) {
+                this.barrier.top = 0;
+                return false
+            }
+            else this.barrier.top = this.barrier.top - change;
+        } else if (dir.x === 1) {
+            if (this.barrier.right - change > this.fieldSize.x) {
+                this.barrier.right = this.fieldSize.x;
+                return false;
+            }
+            else this.barrier.right = this.barrier.right - change;
+        } else if (dir.y === 1) {
+            if (this.barrier.bottom - change > this.fieldSize.y) {
+                this.barrier.bottom = this.fieldSize.y;
+                return false;
+            }
+            else this.barrier.bottom = this.barrier.bottom - change;
+        }
+
+        return true;
     }
 
     public getStyle(origin: Coordinate): CSSProperties {        
@@ -28,6 +60,51 @@ import React, { CSSProperties } from "react";
         })
     }
 
+    public getBarrierStyle(origin: Coordinate): CSSProperties {
+        const baseSize = 4;
+        const pos: Coordinate = { x: 0, y: 0 };
+        const size: Coordinate = { x: 0, y: 0 };
+        
+        if (this.barrier.top > -1) {
+            pos.x = this.position.x + origin.x;
+            pos.y = this.barrier.top + origin.y - baseSize / 2;
+            size.x = this.size;
+            size.y = baseSize;
+        }
+        
+        if (this.barrier.right > -1) {
+            pos.x = this.barrier.right + origin.x + this.size - baseSize / 2;
+            pos.y = this.position.y + origin.y;
+            size.x = baseSize;
+            size.y = this.size;
+        }
+        
+        if (this.barrier.bottom > -1) {
+            pos.x = this.position.x + origin.x;
+            pos.y = this.barrier.bottom + origin.y + this.size - baseSize / 2;
+            size.x = this.size;
+            size.y = baseSize;
+        }
+        
+        if (this.barrier.left > -1) {
+            pos.x = this.barrier.left + origin.x - baseSize / 2;
+            pos.y = this.position.y + origin.y;
+            size.x = baseSize;
+            size.y = this.size;
+        }
+
+        return ({
+            position: 'absolute',
+            top: pos.y,
+            left: pos.x,
+            width: size.x,
+            height: size.y,
+            background: this.color,
+            borderRadius: 10,
+            cursor: 'pointer'
+        })
+    }
+
     public getPosition() {
         return this.position;
     }
@@ -39,20 +116,28 @@ import React, { CSSProperties } from "react";
             y: this.position.y + velocity.y
         }
 
-        if (this.position.x > this.fieldSize.x) {
-            this.position.x = this.fieldSize.x;
+        if (this.position.x > this.fieldSize.x || (this.position.x > this.barrier.right && this.barrier.right > -1)) {
+            this.position.x = (this.barrier.right > -1) && (this.barrier.right < this.fieldSize.x)
+                ? this.barrier.right
+                : this.fieldSize.x;
         }
 
-        if (this.position.x < 0) {
-            this.position.x = 0;
+        if (this.position.x < 0 || (this.position.x < this.barrier.left && this.barrier.left > -1)) {
+            this.position.x = this.barrier.left > 0
+                ? this.barrier.left
+                : 0;
         }
 
-        if (this.position.y > this.fieldSize.y) {
-            this.position.y = this.fieldSize.y;
+        if (this.position.y > this.fieldSize.y || (this.position.y > this.barrier.bottom && this.barrier.bottom > -1)) {
+            this.position.y = (this.barrier.bottom > -1) && (this.barrier.bottom < this.fieldSize.y)
+                ? this.barrier.bottom
+                : this.fieldSize.y;
         }
 
-        if (this.position.y < 0) {
-            this.position.y = 0;
+        if (this.position.y < 0 || (this.position.y < this.barrier.top && this.barrier.top > -1)) {
+            this.position.y = this.barrier.top > 0
+                ? this.barrier.top
+                : 0;
         }
     }
 
@@ -113,7 +198,10 @@ export class LargeBlock extends Block {
             y: fieldSize.y - blockSize
         }
 
-        super(startPosition, blockField, blockSize, '#ffcc3c');
+        const barrier: Barrier = new Barrier();
+        barrier.left = 0;
+
+        super(startPosition, blockField, barrier, blockSize, '#ffcc3c');
     }
 }
 
@@ -123,6 +211,9 @@ export class SmallBlock extends Block {
         
         let startPosition: Coordinate = { x: 0, y: 0};
         let color = '';
+
+        const barrier: Barrier = new Barrier();
+
         switch(position) {
             case (1): {
                 startPosition = {
@@ -130,6 +221,7 @@ export class SmallBlock extends Block {
                     y: fieldSize.y / 2 - 3 * blockSize / 2 + 5
                 };
                 color = '#ff2c22';
+                barrier.top = 0;
                 break;
             }
             case (2): {
@@ -138,6 +230,7 @@ export class SmallBlock extends Block {
                     y: fieldSize.y / 2 - blockSize / 2 + 5
                 };
                 color = '#00dc00';
+                barrier.right = fieldSize.x - blockSize + 10;
                 break;
             }
             case (3): {
@@ -146,6 +239,7 @@ export class SmallBlock extends Block {
                     y: fieldSize.y / 2 + blockSize / 2 + 5
                 };
                 color = '#445bff';
+                barrier.bottom = fieldSize.y - blockSize + 10;
                 break;
             }
         }
@@ -156,7 +250,7 @@ export class SmallBlock extends Block {
             y: fieldSize.y - blockSize
         }
 
-        super(startPosition, blockField, blockSize, color);
+        super(startPosition, blockField, barrier, blockSize, color);
     }
 }
 
@@ -164,6 +258,14 @@ export class VisualBlock extends React.Component<BlockProps, {}> {
     render() {
         return (
             <div style={this.props.Style}></div>
+        )
+    }
+}
+
+export class VisualBarrier extends React.Component<BarrierProps, {}> {
+    render() {
+        return (
+            <div id={this.props.Id} style={this.props.Style}></div>
         )
     }
 }
@@ -182,6 +284,18 @@ export enum Blocks {
 
 type BlockProps = {
     Style: React.CSSProperties
+}
+
+type BarrierProps = {
+    Id: string,
+    Style: React.CSSProperties
+}
+
+class Barrier {
+    top: number = -1;
+    right: number = -1;
+    bottom: number = -1;
+    left: number = -1;
 }
 
 export default Block;
