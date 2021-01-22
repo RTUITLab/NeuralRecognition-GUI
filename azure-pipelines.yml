@@ -27,5 +27,4 @@ stages:
         tags: |
           $(Build.BuildId)
           latest-build
-          displayName: publish build artifact
 
