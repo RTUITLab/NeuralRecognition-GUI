@@ -27,4 +27,21 @@ stages:
         tags: |
           $(Build.BuildId)
           latest
-
+- stage: UpdateService
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: none
+            - task: SSH@0
+              inputs:
+                sshEndpoint: 'swarm manager'
+                runOptions: 'commands'
+                commands: 'docker service update --image rtuitlab/neural-recognition-gui:$(Build.BuildId) neural-recognition-gui_app'
+                readyTimeout: '20000'
