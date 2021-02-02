@@ -3,23 +3,42 @@ import IController from "./IController";
 
 const KeyboardController: IController = {
     enable: () => {
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowUp') {
+        var socket = new WebSocket("ws://localhost:9999");
+        socket.onopen = function()
+        {
+            socket.send("WaitingForCommand");
+        };
+        socket.onclose = function(event)
+        {
+            if (event.wasClean)
+            {
+                alert('Соединение закрыто чисто');
+            } else {
+                alert('Обрыв соединения');
+            }
+            alert('Код: ' + event.code + ' причина: ' + event.reason);
+        };
+
+        socket.onmessage = function(event)
+        {
+            console.log(event.data)
+            if (event.data === 'Up') {
                 ControlEvents.redUp();
                 /*ControlEvents.yellowLeft();
                 ControlEvents.blueDown();
                 ControlEvents.greenRight();*/
             }
-            if (e.key === 'ArrowLeft') {
+            if (event.data === 'Left') {
                 ControlEvents.yellowLeft();
             }
-            if (e.key === 'ArrowDown') {
+            if (event.data === 'Down') {
                 ControlEvents.blueDown();
             }
-            if (e.key === 'ArrowRight') {
+            if (event.data === 'Right') {
                 ControlEvents.greenRight();
             }
-        })
+            socket.send("WaitingForCommand");
+        };
     }
 }
 

@@ -52,3 +52,23 @@ const controller: IController = CustomController;
 ```
 
 If every step is correct, the app will be launched with new controller. 
+
+## Launch python testing app
+
+for Windows
+
+in `websocket controller` directory
+
+Run `pip install virtualenv` to install virtualenv
+
+Run `virtualenv NeuralGUI` to create virtualenv
+
+Run `NeuralGUI\Scripts\activate.bat` to activate virtualenv
+
+Run `pip install -r requirements.txt` to install requirements
+
+Run `python main.py` to launch app
+
+Open GUI page
+
+Run commands `Up`, `Down`, `Left`, `Right` to move blocks
